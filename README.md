@@ -1,9 +1,23 @@
 # Haru
-A solution for hotfix Unity monobehaviour code based on ilruntime
+A solution for hotfix Unity C# monobehaviour code based on ilruntime
 
-这是一篇Haru框架使用前的准备文档，为了支持到你的unity项目将来能够顺利的转型使用Haru框架实现热更新，有些调整是必须要做的，即使你不会使用haru或ilruntime，这些建议对你的项目仍然是有益的，因此当下就可以对你的项目进行改造了。
 
-# ILRuntime相关限制
+Haru是一个开源的Unity项目的C#实现方案，它的特色和要达成的目标如下：
+- 同时支持热更和非热更模式两种运行模式  Haru项目的日常开发调试可以做到和普通的Unity项目一样，为此开发人员不用学习额外的语言和热更新知识就可以实现Unity热更新项目的开发。Haru对于一般的Unity业务开发者来说时一个透明的系统。同时，Haru也支持普通的unity app项目出包模式，方便将热更项目瞬间转换成非热更项目
+- 保持热更和非热更运行结果的一致
+- 支持Monobehaviour的添加，删除，和更新
+- 内嵌的资源热更新框架
+ 如果没有特殊要求，使用者无需添加额外的工作就能拥有这些功能
+- 支持动态的内容的扩充
+ 对于一些大型应用，项目的所有资源一般不可能都处于同一个Unity项目之内，对于更大型的项目，程序可能无法同处于一个项目之内，Haru将为这样的项目提供开发支持。
+ Haru已经实现在主程序不冲突的情况下，跨应用运行内容。在将来，Haru的开发者只需要载入一小部分内容进行开发，就可以支持到整个项目的开发
+ 
+
+ 
+# Unity & Ilruntime 建议
+
+接下来是一篇Haru框架使用前的准备文档，为了支持到你的unity项目将来能够顺利的转型使用Haru框架实现热更新，有些调整是必须要做的。即使你不会使用haru或ilruntime，这些建议对你的项目仍然是有益的，因此当下就可以对你的项目进行改造了。
+
 
 ## 第三方插件的本地方法和业务分离
 
@@ -52,15 +66,15 @@ Ilruntime不能保证所有的Type都能得到预期的结果，在非热更和�
 
  对Delegate/Func/Action等变量的GetType的Type无法进行正确的比较。比如如下的代码，将得不到正确的结果
 
-           System.Action a = () =&gt; { };
+           System.Action a = () => { };
 
-            System.Action&lt;int&gt; a\_2 = (i) =&gt; { };
+            System.Action&lt;int&gt; a\_2 = (i) => { };
 
             Debug.Log(typeof(System.Action) == a.GetType());  //false
 
             Debug.Log(typeof(System.Action&lt;int&gt;) == a\_2.GetType());  //false
 
-###         Delegate/Func/Action仅限制用其()和==,!=操作，避免使用其对象的其他接口
+###         Delegate/Func/Action仅限制用其()操作，避免使用其对象的其他接口
 
   Delegate因为情况特殊，无法使用替代物，所以在调用其他接口时，可以肯定是无法得出结果的一致。事实上ILRuntime将所有的热更代码中的此类变量都转换成了ILRuntime.Runtime.Intepreter.MethodDelegateAdapter及其子类中的一个方法，如果你想访问此变量的target接口，将不会得到预计的结果。
 
